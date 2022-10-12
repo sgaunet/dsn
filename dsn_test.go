@@ -1,6 +1,7 @@
 package dsn
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -30,7 +31,7 @@ func TestDSN_GetUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &DSN{
+			d := &dsntype{
 				dsn: tt.fields.dsn,
 			}
 			if got := d.GetUser(); got != tt.want {
@@ -63,14 +64,131 @@ func TestDSN_GetPostgresUri(t *testing.T) {
 			},
 			want: "host=host port=5432 user=postgres password=password dbname=mydb sslmode=disable",
 		},
+		{
+			name: "complete with search_path",
+			fields: fields{
+				dsn: "postgres://postgres:password@host:5432/mydb?sslmode=disable&search_path=namespace",
+			},
+			want: "host=host port=5432 user=postgres password=password dbname=mydb sslmode=disable search_path=namespace",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &DSN{
+			d := &dsntype{
 				dsn: tt.fields.dsn,
 			}
 			if got := d.GetPostgresUri(); got != tt.want {
 				t.Errorf("DSN.GetPostgresUri() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_dsntype_GetPortInt(t *testing.T) {
+	type fields struct {
+		dsn string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   int
+	}{
+		{
+			name: "port string",
+			fields: fields{
+				dsn: "postgres://user:password@host:port/dbname",
+			},
+			want: 0,
+		},
+		{
+			name: "port int",
+			fields: fields{
+				dsn: "postgres://user:password@host:5432/dbname",
+			},
+			want: 5432,
+		},
+		{
+			name: "no port defined",
+			fields: fields{
+				dsn: "postgres://user:password@host/dbname",
+			},
+			want: 0,
+		},
+		{
+			name: "no port defined",
+			fields: fields{
+				dsn: "host/dbname",
+			},
+			want: 0,
+		},
+		{
+			name: "pg://host:5433",
+			fields: fields{
+				dsn: "pg://host:5433",
+			},
+			want: 5433,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &dsntype{
+				dsn: tt.fields.dsn,
+			}
+			if got := d.GetPortInt(); got != tt.want {
+				t.Errorf("dsntype.GetPortInt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNew(t *testing.T) {
+	type args struct {
+		dsn string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *dsntype
+		wantErr bool
+	}{
+		{
+			name: "ssh",
+			args: args{
+				dsn: "ssh://host",
+			},
+			want: &dsntype{
+				dsn: "ssh://host",
+			},
+			wantErr: false,
+		},
+		{
+			name: "pg",
+			args: args{
+				dsn: "pg://user:password@host:5432",
+			},
+			want: &dsntype{
+				dsn: "pg://user:password@host:5432",
+			},
+			wantErr: false,
+		},
+		{
+			name: "pg wrong port",
+			args: args{
+				dsn: "pg://user:password@host:wrongport",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := New(tt.args.dsn)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
 		})
 	}
