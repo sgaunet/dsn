@@ -10,11 +10,23 @@ import (
 	"strings"
 )
 
+type DSN interface {
+	GetUser() string
+	GetPassword() string
+	GetHost() string
+	GetPort(string) string
+	GetPortInt(int) int
+	GetFragment(string) string
+	GetPath() string
+	GetPathWithoutSlash() string
+	GetPostgresUri() string
+}
+
 type dsntype struct {
 	dsn string
 }
 
-func New(dsn string) (*dsntype, error) {
+func New(dsn string) (DSN, error) {
 	r := regexp.MustCompile(`\w+://(\w+@|\w+:\w+@)?[^:/]*(:\d*)?(/.*)?$`)
 	if !r.MatchString(dsn) {
 		return nil, errors.New("wrong format")
@@ -42,25 +54,28 @@ func (d *dsntype) GetHost() string {
 	return host
 }
 
-func (d *dsntype) GetPort() string {
+func (d *dsntype) GetPort(defaultPort string) string {
 	u, _ := url.Parse(d.dsn)
 	_, port, _ := net.SplitHostPort(u.Host)
+	if port == "" {
+		return defaultPort
+	}
 	return port
 }
 
-func (d *dsntype) GetPortInt() int {
+func (d *dsntype) GetPortInt(defaultPort int) int {
 	r := regexp.MustCompile(`(\w|.)*:\d+.*`)
 	if !r.MatchString(d.dsn) {
-		return 0
+		return defaultPort
 	}
 	u, _ := url.Parse(d.dsn)
 	_, port, err := net.SplitHostPort(u.Host)
 	if err != nil {
-		return 0
+		return defaultPort
 	}
 	portInt, err := strconv.Atoi(port)
 	if err != nil {
-		return 0
+		return defaultPort
 	}
 	return portInt
 }
@@ -86,7 +101,7 @@ func (d *dsntype) GetPathWithoutSlash() string {
 }
 
 func (d *dsntype) GetPostgresUri() string {
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", d.GetHost(), d.GetPort(), d.GetUser(), d.GetPassword(), d.GetPathWithoutSlash(), d.GetFragment("sslmode"))
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", d.GetHost(), d.GetPort("5432"), d.GetUser(), d.GetPassword(), d.GetPathWithoutSlash(), d.GetFragment("sslmode"))
 	if d.GetFragment("search_path") != "" {
 		psqlInfo = psqlInfo + fmt.Sprintf(" search_path=%s", d.GetFragment("search_path"))
 	}

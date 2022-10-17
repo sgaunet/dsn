@@ -55,7 +55,7 @@ func TestDSN_GetPostgresUri(t *testing.T) {
 			fields: fields{
 				dsn: "toto",
 			},
-			want: "host= port= user= password= dbname=toto sslmode=",
+			want: "host= port=5432 user= password= dbname=toto sslmode=",
 		},
 		{
 			name: "complete",
@@ -98,7 +98,7 @@ func Test_dsntype_GetPortInt(t *testing.T) {
 			fields: fields{
 				dsn: "postgres://user:password@host:port/dbname",
 			},
-			want: 0,
+			want: 5432,
 		},
 		{
 			name: "port int",
@@ -112,14 +112,14 @@ func Test_dsntype_GetPortInt(t *testing.T) {
 			fields: fields{
 				dsn: "postgres://user:password@host/dbname",
 			},
-			want: 0,
+			want: 5432,
 		},
 		{
 			name: "no port defined",
 			fields: fields{
 				dsn: "host/dbname",
 			},
-			want: 0,
+			want: 5432,
 		},
 		{
 			name: "pg://host:5433",
@@ -134,7 +134,7 @@ func Test_dsntype_GetPortInt(t *testing.T) {
 			d := &dsntype{
 				dsn: tt.fields.dsn,
 			}
-			if got := d.GetPortInt(); got != tt.want {
+			if got := d.GetPortInt(5432); got != tt.want {
 				t.Errorf("dsntype.GetPortInt() = %v, want %v", got, tt.want)
 			}
 		})
@@ -148,7 +148,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *dsntype
+		want    DSN
 		wantErr bool
 	}{
 		{
@@ -187,8 +187,53 @@ func TestNew(t *testing.T) {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("New() = %v, want %v", got, tt.want)
+			if got != tt.want {
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("New() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func Test_dsntype_GetPath(t *testing.T) {
+	type fields struct {
+		dsn string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "empty path",
+			fields: fields{
+				dsn: "redis://host",
+			},
+			want: "",
+		},
+		{
+			name: "path=/0",
+			fields: fields{
+				dsn: "redis://host/0",
+			},
+			want: "/0",
+		},
+		{
+			name: "/sdf/sdf/sdf",
+			fields: fields{
+				dsn: "/sdf/sdf/sdf",
+			},
+			want: "/sdf/sdf/sdf",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &dsntype{
+				dsn: tt.fields.dsn,
+			}
+			if got := d.GetPath(); got != tt.want {
+				t.Errorf("dsntype.GetPath() = %v, want %v", got, tt.want)
 			}
 		})
 	}
