@@ -20,6 +20,7 @@ type DSN interface {
 	GetPath() string
 	GetPathWithoutSlash() string
 	GetPostgresUri() string
+	GetScheme() string
 }
 
 type dsntype struct {
@@ -106,4 +107,9 @@ func (d *dsntype) GetPostgresUri() string {
 		psqlInfo = psqlInfo + fmt.Sprintf(" search_path=%s", d.GetFragment("search_path"))
 	}
 	return psqlInfo
+}
+
+func (d *dsntype) GetScheme() string {
+	u, _ := url.Parse(d.dsn)
+	return u.Scheme
 }

@@ -238,3 +238,53 @@ func Test_dsntype_GetPath(t *testing.T) {
 		})
 	}
 }
+
+func Test_dsntype_GetScheme(t *testing.T) {
+	type fields struct {
+		dsn string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "empty scheme",
+			fields: fields{
+				dsn: "host",
+			},
+			want: "",
+		},
+		{
+			name: "http scheme",
+			fields: fields{
+				dsn: "http://url.com",
+			},
+			want: "http",
+		},
+		{
+			name: "https scheme",
+			fields: fields{
+				dsn: "https://url.com",
+			},
+			want: "https",
+		},
+		{
+			name: "pg scheme",
+			fields: fields{
+				dsn: "pg://user;password@sdfsdf",
+			},
+			want: "pg",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &dsntype{
+				dsn: tt.fields.dsn,
+			}
+			if got := d.GetScheme(); got != tt.want {
+				t.Errorf("dsntype.GetScheme() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
