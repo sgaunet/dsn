@@ -1,0 +1,50 @@
+name: Exec testsuite
+
+testcases:
+- name: init
+  steps:
+  - type: exec
+    script: pwd
+    info: '{{.result.systemout}}'
+    vars:
+      tstFolder:
+        from: result.systemout
+        # regex: foo with a ([a-z]+) here
+
+- name: wrong dsn
+  steps:
+  - type: exec
+    script: |
+      cd "{{.init.tstFolder}}/../"
+      go run cmd/main.go get port --d "wrong-dsn" 
+    assertions:
+    - result.code ShouldNotEqual 0
+
+- name: setenv subcommand
+  steps:
+  - type: exec
+    script: |
+      cd "{{.init.tstFolder}}/../"
+      go run cmd/main.go setenv --d "pg://login:password@host/mydb?timeout=1000"  --pr DB_
+    assertions:
+    - result.code ShouldEqual 0
+
+- name: get port (empty)
+  steps:
+  - type: exec
+    script: |
+      cd "{{.init.tstFolder}}/../"
+      go run cmd/main.go get port --d "pg://login:password@host/cats?timeout=1000"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual ""
+
+- name: get port (default 5432)
+  steps:
+  - type: exec
+    script: |
+      cd "{{.init.tstFolder}}/../"
+      go run cmd/main.go get port --d "pg://login:password@host/cats?timeout=1000" --p 5432
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual "5432"

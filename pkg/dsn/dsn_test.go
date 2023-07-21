@@ -103,7 +103,7 @@ func Test_dsntype_GetPortInt(t *testing.T) {
 			name:      "port string",
 			dsnToTest: "postgres://user:password@host:port/dbname",
 			want:      5432,
-			wantErr:   false,
+			wantErr:   true,
 		},
 		{
 			name:      "port int",
@@ -143,6 +143,52 @@ func Test_dsntype_GetPortInt(t *testing.T) {
 	}
 }
 
+func Test_dsntype_GetPort(t *testing.T) {
+	defaultPort := "5432"
+	tests := []struct {
+		name      string
+		dsnToTest string
+		want      string
+		wantErr   bool
+	}{
+		{
+			name:      "port int",
+			dsnToTest: "postgres://user:password@host:5432/dbname",
+			want:      "5432",
+			wantErr:   false,
+		},
+		{
+			name:      "no port defined",
+			dsnToTest: "postgres://user:password@host/dbname",
+			want:      "5432",
+			wantErr:   false,
+		},
+		{
+			name:      "pg://host:5433",
+			dsnToTest: "pg://host:5433",
+			want:      "5433",
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d, err := dsn.New(tt.dsnToTest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New(), wantErr %v", tt.wantErr)
+				return
+			}
+			if tt.wantErr && d != nil {
+				t.Errorf("expected d to be nil")
+			}
+			if !tt.wantErr {
+				if got := d.GetPort(defaultPort); got != tt.want {
+					t.Errorf("DSN.GetPortInt() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
 func TestNew(t *testing.T) {
 	type args struct {
 		dsn string
@@ -171,7 +217,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				dsn: "pg://user:password@host:port",
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -204,7 +250,7 @@ func Test_dsntype_GetPath(t *testing.T) {
 		{
 			name:      "path=/0",
 			dsnToTest: "redis://host/0",
-			want:      "/0",
+			want:      "0",
 			wantErr:   false,
 		},
 		{
@@ -225,7 +271,7 @@ func Test_dsntype_GetPath(t *testing.T) {
 				t.Errorf("expected d to be nil")
 			}
 			if !tt.wantErr {
-				if got := d.GetPath(); got != tt.want {
+				if got := d.GetDBName(); got != tt.want {
 					t.Errorf("DSN.GetPath() = %v, want %v", got, tt.want)
 				}
 			}
@@ -328,6 +374,69 @@ func Test_dsntype_GetHost(t *testing.T) {
 			}
 			if !tt.wantErr {
 				if got := d.GetHost(); got != tt.want {
+					t.Errorf("DSN.GetHost() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func Test_dsntype_GetParameter(t *testing.T) {
+	tests := []struct {
+		name      string
+		dsnToTest string
+		parameter string
+		want      string
+		wantErr   bool
+	}{
+		{
+			name:      "empty parameter",
+			dsnToTest: "host",
+			parameter: "test",
+			want:      "",
+			wantErr:   true,
+		},
+		{
+			name:      "empty parameter with good dsn",
+			dsnToTest: "http://url.com",
+			parameter: "test",
+			want:      "",
+			wantErr:   false,
+		},
+		{
+			name:      "simple parameter",
+			dsnToTest: "https://url.com/db?test=1",
+			parameter: "test",
+			want:      "1",
+			wantErr:   false,
+		},
+		{
+			name:      "double parameter",
+			dsnToTest: "pg://user:password@sdfsdf?test=5&test=sdfsdf",
+			parameter: "test",
+			want:      "5",
+			wantErr:   false,
+		},
+		{
+			name:      "multiple parameter",
+			dsnToTest: "pg://user:password@sdfsdf?test5=5&test3=sdfsdf",
+			parameter: "test5",
+			want:      "5",
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d, err := dsn.New(tt.dsnToTest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New(), wantErr %v", tt.wantErr)
+				return
+			}
+			if tt.wantErr && d != nil {
+				t.Errorf("expected d to be nil")
+			}
+			if !tt.wantErr {
+				if got := d.GetParameter(tt.parameter); got != tt.want {
 					t.Errorf("DSN.GetHost() = %v, want %v", got, tt.want)
 				}
 			}

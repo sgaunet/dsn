@@ -1,0 +1,25 @@
+# https://taskfile.dev
+version: '3'
+vars:
+  BINFILE: dsn
+
+tasks:
+  default:
+    cmds:
+      - CGO_ENABLED=0 go build -ldflags="-s -w" -o "{{.BINFILE}}" cmd/main.go
+      - upx "{{.BINFILE}}"
+    generates:
+      - "{{.BINFILE}}"
+
+  tests:
+    dir: tests
+    cmds:
+      - venom run --stop-on-failure testsuite.yml  --output-dir="log"
+
+  snapshot:
+    cmds:
+      - GITLAB_TOKEN="" goreleaser --clean --snapshot
+    
+  release:
+    cmds:
+      - GITLAB_TOKEN="" goreleaser --clean
