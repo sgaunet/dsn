@@ -28,7 +28,7 @@ type dsntype struct {
 }
 
 func New(dsn string) (DSN, error) {
-	r := regexp.MustCompile(`\w+://(\w+@|\w+:\w+@)?[^:/]*(:\d*)?(/.*)?$`)
+	r := regexp.MustCompile(`\w+://(\w+@|\w+:\w+@)?[^:/]*(:\d*|:\w+)?(/.*)?$`)
 	if !r.MatchString(dsn) {
 		return nil, errors.New("wrong format")
 	}
@@ -51,7 +51,10 @@ func (d *dsntype) GetPassword() string {
 
 func (d *dsntype) GetHost() string {
 	u, _ := url.Parse(d.dsn)
-	host, _, _ := net.SplitHostPort(u.Host)
+	host, _, err := net.SplitHostPort(u.Host)
+	if err != nil {
+		return u.Host
+	}
 	return host
 }
 
