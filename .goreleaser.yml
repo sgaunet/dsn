@@ -9,23 +9,6 @@ builds:
     goos:
       - linux
       - darwin
-    goarch:
-      - amd64
-      - arm
-      - arm64
-    goarm:
-      - "6"
-      - "7"
-    id: lin
-    dir: cmd
-    hooks:
-      post:
-        - upx "{{ .Path }}"
-  - env:
-      - CGO_ENABLED=0
-    ldflags:
-      - -X github.com/sgaunet/dsn/internal/cmd.version={{.Version}} -s -w
-    goos:
       - windows
     goarch:
       - amd64
@@ -34,7 +17,7 @@ builds:
     goarm:
       - "6"
       - "7"
-    id: win
+    id: lin
     dir: cmd
 
 archives:
