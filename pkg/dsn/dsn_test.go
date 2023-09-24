@@ -3,7 +3,7 @@ package dsn_test
 import (
 	"testing"
 
-	"github.com/sgaunet/dsn/pkg/dsn"
+	"github.com/sgaunet/dsn/v2/pkg/dsn"
 )
 
 func TestDSN_GetUser(t *testing.T) {

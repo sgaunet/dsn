@@ -1,4 +1,4 @@
-module github.com/sgaunet/dsn
+module github.com/sgaunet/dsn/v2
 
 go 1.19
 
