@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/dsn)](https://goreportcard.com/report/github.com/sgaunet/dsn)
+
 # dsn
 
 Tiny library to handle data source name : scheme://user:password@host:port/dbname&sslmode=disable
