@@ -40,6 +40,6 @@ jobs:
       # RUN TEST HERE
     - run: go test ./... -coverprofile c.out
       # after build step
-    - run: ./cc-test-reporter after-build --prefix=github.com/sgaunet/dsn
+    - run: ./cc-test-reporter after-build --prefix=github.com/sgaunet/dsn/v2
       env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
