@@ -1,4 +1,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/dsn)](https://goreportcard.com/report/github.com/sgaunet/dsn)
+[![Maintainability](https://api.codeclimate.com/v1/badges/390713a97add700e028c/maintainability)](https://codeclimate.com/github/sgaunet/dsn/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/390713a97add700e028c/test_coverage)](https://codeclimate.com/github/sgaunet/dsn/test_coverage)
 
 # dsn
 
