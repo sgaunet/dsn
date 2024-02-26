@@ -25,6 +25,12 @@ func TestDSN_GetUser(t *testing.T) {
 			want:      "",
 			wantErr:   true,
 		},
+		{
+			name:      "field with -",
+			dsnToTest: "postgres://user-name:password-with-hyphens@host-suffix.domain.com:5432/mydb-3?sslmode=require&connect_timeout=10s",
+			want:      "user-name",
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -27,7 +27,7 @@ type dsntype struct {
 }
 
 func New(dsn string) (DSN, error) {
-	r := regexp.MustCompile(`\w+://(\w+@|\w+:\w+@)?[^:/]*(:\d*)?(/.*)?$`)
+	r := regexp.MustCompile(`\w+://([\w-]+@|[\w-]+:[\w-]+@)?[^:/]*(:\d*)?(/.*)?$`)
 	if !r.MatchString(dsn) {
 		return nil, errors.New("wrong format")
 	}
