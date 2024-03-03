@@ -30,7 +30,7 @@ type dsntype struct {
 func New(dsn string) (DSN, error) {
 	r := regexp.MustCompile(`\w+://([\w-]+@|[\w-]+:[^@]+@)?[^:/]*(:\d*)?(/.*)?$`)
 	if !r.MatchString(dsn) {
-		return nil, errors.New("wrong format")
+		return nil, errors.New("wrong format. DSN must be in format: <scheme>://<user>:<password>@<host>:<port>/<dbname>?<parameters>")
 	}
 	d := dsntype{
 		dsn: dsn,
