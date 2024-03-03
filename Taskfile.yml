@@ -5,6 +5,11 @@ vars:
 
 tasks:
   default:
+    desc: "List tasks"
+    cmds:
+      - task -a
+
+  build:
     cmds:
       - CGO_ENABLED=0 go build -ldflags="-s -w" -o "{{.BINFILE}}" cmd/main.go
       - upx "{{.BINFILE}}"
