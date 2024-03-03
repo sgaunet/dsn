@@ -10,6 +10,7 @@ tasks:
       - task -a
 
   build:
+    desc: "Build the binary"
     cmds:
       - CGO_ENABLED=0 go build -ldflags="-s -w" -o "{{.BINFILE}}" cmd/main.go
       - upx "{{.BINFILE}}"
@@ -17,14 +18,17 @@ tasks:
       - "{{.BINFILE}}"
 
   tests:
+    desc: "Run tests"
     dir: tests
     cmds:
       - venom run --stop-on-failure testsuite.yml  --output-dir="log"
 
   snapshot:
+    desc: "Create a snapshot"
     cmds:
       - GITLAB_TOKEN="" goreleaser --clean --snapshot
     
   release:
+    desc: "Create a release"
     cmds:
       - GITLAB_TOKEN="" goreleaser --clean
