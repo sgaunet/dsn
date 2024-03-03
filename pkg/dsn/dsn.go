@@ -20,6 +20,7 @@ type DSN interface {
 	GetDBName() string
 	GetPostgresUri() string
 	GetScheme() string
+	String() string
 }
 
 type dsntype struct {
@@ -115,4 +116,8 @@ func (d *dsntype) GetPostgresUri() string {
 func (d *dsntype) GetScheme() string {
 	u, _ := url.Parse(d.dsn)
 	return u.Scheme
+}
+
+func (d *dsntype) String() string {
+	return d.dsn
 }

@@ -455,3 +455,54 @@ func Test_dsntype_GetParameter(t *testing.T) {
 		})
 	}
 }
+
+func TestString(t *testing.T) {
+	tests := []struct {
+		name      string
+		dsnToTest string
+		want      string
+		wantErr   bool
+	}{
+		{
+			name:      "user postgres",
+			dsnToTest: "postgres://postgres:password@host:5432/mydb?sslmode=disable",
+			want:      "postgres://postgres:password@host:5432/mydb?sslmode=disable",
+			wantErr:   false,
+		},
+		{
+			name:      "wrong format",
+			dsnToTest: "postgres",
+			want:      "",
+			wantErr:   true,
+		},
+		{
+			name:      "password with special characters",
+			dsnToTest: "postgres://user-name:pas&!sword-with-hyphens@host-suffix.domain.com:5432/mydb-3?sslmode=require&connect_timeout=10s",
+			want:      "postgres://user-name:pas&!sword-with-hyphens@host-suffix.domain.com:5432/mydb-3?sslmode=require&connect_timeout=10s",
+			wantErr:   false,
+		},
+		{
+			name:      "field with -",
+			dsnToTest: "postgres://user-name:password-with-hyphens@host-suffix.domain.com:5432/mydb-3?sslmode=require&connect_timeout=10s",
+			want:      "postgres://user-name:password-with-hyphens@host-suffix.domain.com:5432/mydb-3?sslmode=require&connect_timeout=10s",
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d, err := dsn.New(tt.dsnToTest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New(), wantErr %v", tt.wantErr)
+				return
+			}
+			if tt.wantErr && d != nil {
+				t.Errorf("expected d to be nil")
+			}
+			if !tt.wantErr {
+				if got := d.String(); got != tt.want {
+					t.Errorf("DSN.String() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
