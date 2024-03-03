@@ -13,9 +13,6 @@ tasks:
     desc: "Build the binary"
     cmds:
       - CGO_ENABLED=0 go build -ldflags="-s -w" -o "{{.BINFILE}}" cmd/main.go
-      - upx "{{.BINFILE}}"
-    generates:
-      - "{{.BINFILE}}"
 
   tests:
     desc: "Run tests"
