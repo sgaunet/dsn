@@ -37,6 +37,12 @@ func TestDSN_GetUser(t *testing.T) {
 			want:      "user-name",
 			wantErr:   false,
 		},
+		{
+			name:      "...",
+			dsnToTest: "postgres://postgres:password@postgres-server:5432/postgres?sslmode=disable",
+			want:      "postgres",
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -80,6 +86,12 @@ func TestDSN_GetPostgresUri(t *testing.T) {
 			name:      "complete with search_path",
 			dsnToTest: "postgres://postgres:password@host:5432/mydb?sslmode=disable&search_path=namespace",
 			want:      "host=host port=5432 user=postgres password=password dbname=mydb sslmode=disable search_path=namespace",
+			wantErr:   false,
+		},
+		{
+			name:      "...",
+			dsnToTest: "postgres://postgres:password@postgres-server:5432/postgres?sslmode=disable",
+			want:      "host=postgres-server port=5432 user=postgres password=password dbname=postgres sslmode=disable",
 			wantErr:   false,
 		},
 	}
@@ -371,6 +383,12 @@ func Test_dsntype_GetHost(t *testing.T) {
 			name:      "pg scheme",
 			dsnToTest: "pg://user:password@sdfsdf",
 			want:      "sdfsdf",
+			wantErr:   false,
+		},
+		{
+			name:      "...",
+			dsnToTest: "postgres://postgres:password@postgres-server:5432/postgres?sslmode=disable",
+			want:      "postgres-server",
 			wantErr:   false,
 		},
 	}

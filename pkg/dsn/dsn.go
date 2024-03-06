@@ -25,6 +25,7 @@ type DSN interface {
 
 type dsntype struct {
 	dsn string
+	url *url.URL
 }
 
 func New(dsn string) (DSN, error) {
@@ -32,38 +33,36 @@ func New(dsn string) (DSN, error) {
 	if !r.MatchString(dsn) {
 		return nil, errors.New("wrong format. DSN must be in format: <scheme>://<user>:<password>@<host>:<port>/<dbname>?<parameters>")
 	}
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return nil, err
+	}
 	d := dsntype{
 		dsn: dsn,
+		url: u,
 	}
 	return &d, nil
 }
 
 func (d *dsntype) GetUser() string {
-	u, _ := url.Parse(d.dsn)
-	return u.User.Username()
+	return d.url.User.Username()
 }
 
 func (d *dsntype) GetPassword() string {
-	u, _ := url.Parse(d.dsn)
-	password, _ := u.User.Password()
+	password, _ := d.url.User.Password()
 	return password
 }
 
 func (d *dsntype) GetHost() string {
-	u, _ := url.Parse(d.dsn)
-	host, _, err := net.SplitHostPort(u.Host)
+	host, _, err := net.SplitHostPort(d.url.Host)
 	if err != nil {
-		return u.Host
+		return d.url.Host
 	}
 	return host
 }
 
 func (d *dsntype) GetPort(defaultPort string) string {
-	u, err := url.Parse(d.dsn)
-	if err != nil {
-		return defaultPort
-	}
-	_, port, err := net.SplitHostPort(u.Host)
+	_, port, err := net.SplitHostPort(d.url.Host)
 	if err != nil {
 		return defaultPort
 	}
@@ -78,8 +77,7 @@ func (d *dsntype) GetPortInt(defaultPort int) int {
 	if !r.MatchString(d.dsn) {
 		return defaultPort
 	}
-	u, _ := url.Parse(d.dsn)
-	_, port, err := net.SplitHostPort(u.Host)
+	_, port, err := net.SplitHostPort(d.url.Host)
 	if err != nil {
 		return defaultPort
 	}
@@ -114,8 +112,7 @@ func (d *dsntype) GetPostgresUri() string {
 }
 
 func (d *dsntype) GetScheme() string {
-	u, _ := url.Parse(d.dsn)
-	return u.Scheme
+	return d.url.Scheme
 }
 
 func (d *dsntype) String() string {
