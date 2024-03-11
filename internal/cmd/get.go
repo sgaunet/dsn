@@ -15,7 +15,7 @@ var getCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("please select a subcommand")
-		cmd.Help()
+		_ = cmd.Help()
 	},
 }
 
