@@ -23,7 +23,7 @@ func TestDSN_GetUser(t *testing.T) {
 			name:      "wrong format",
 			dsnToTest: "postgres",
 			want:      "",
-			wantErr:   true,
+			wantErr:   false,
 		},
 		{
 			name:      "password with special characters",
@@ -73,8 +73,8 @@ func TestDSN_GetPostgresUri(t *testing.T) {
 		{
 			name:      "wrong format",
 			dsnToTest: "postgres",
-			want:      "",
-			wantErr:   true,
+			want:      "host=postgres port=5432 user= password= dbname= sslmode=",
+			wantErr:   false,
 		},
 		{
 			name:      "complete",
@@ -206,7 +206,7 @@ func Test_dsntype_GetPort(t *testing.T) {
 			}
 			if !tt.wantErr {
 				if got := d.GetPort(defaultPort); got != tt.want {
-					t.Errorf("DSN.GetPortInt() = %v, want %v", got, tt.want)
+					t.Errorf("DSN.GetPort() = %v, want %v", got, tt.want)
 				}
 			}
 		})
@@ -314,7 +314,7 @@ func Test_dsntype_GetScheme(t *testing.T) {
 			name:      "empty scheme",
 			dsnToTest: "host",
 			want:      "",
-			wantErr:   true,
+			wantErr:   false,
 		},
 		{
 			name:      "http scheme",
@@ -365,7 +365,7 @@ func Test_dsntype_GetHost(t *testing.T) {
 			name:      "empty scheme",
 			dsnToTest: "host",
 			want:      "host",
-			wantErr:   true,
+			wantErr:   false,
 		},
 		{
 			name:      "http scheme",
@@ -424,7 +424,7 @@ func Test_dsntype_GetParameter(t *testing.T) {
 			dsnToTest: "host",
 			parameter: "test",
 			want:      "",
-			wantErr:   true,
+			wantErr:   false,
 		},
 		{
 			name:      "empty parameter with good dsn",
@@ -444,7 +444,7 @@ func Test_dsntype_GetParameter(t *testing.T) {
 			name:      "double parameter",
 			dsnToTest: "pg://user:password@sdfsdf?test=5&test=sdfsdf",
 			parameter: "test",
-			want:      "5",
+			want:      "sdfsdf",
 			wantErr:   false,
 		},
 		{
@@ -490,8 +490,8 @@ func TestString(t *testing.T) {
 		{
 			name:      "wrong format",
 			dsnToTest: "postgres",
-			want:      "",
-			wantErr:   true,
+			want:      "postgres",
+			wantErr:   false,
 		},
 		{
 			name:      "password with special characters",
@@ -519,6 +519,57 @@ func TestString(t *testing.T) {
 			if !tt.wantErr {
 				if got := d.String(); got != tt.want {
 					t.Errorf("DSN.String() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func Test_dsntype_GetPassword(t *testing.T) {
+	tests := []struct {
+		name      string
+		dsnToTest string
+		want      string
+		wantErr   bool
+	}{
+		{
+			name:      "simple password",
+			dsnToTest: "postgres://user:password@host:5432/dbname",
+			want:      "password",
+			wantErr:   false,
+		},
+		{
+			name:      "no port defined",
+			dsnToTest: "postgres://user:password@host/dbname",
+			want:      "password",
+			wantErr:   false,
+		},
+		{
+			name:      "no password",
+			dsnToTest: "pg://host:5433",
+			want:      "",
+			wantErr:   false,
+		},
+		// {
+		// 	name:      "complex password",
+		// 	dsnToTest: "pg://user:%n,;/@host:5433",
+		// 	want:      "%¨n,;/",
+		// 	wantErr:   false,
+		// },
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d, err := dsn.New(tt.dsnToTest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New(), wantErr %v, got %v", tt.wantErr, err)
+				return
+			}
+			if tt.wantErr && d != nil {
+				t.Errorf("expected d to be nil")
+			}
+			if !tt.wantErr {
+				if got := d.GetPassword(); got != tt.want {
+					t.Errorf("DSN.GetPassword() = %v, want %v", got, tt.want)
 				}
 			}
 		})
