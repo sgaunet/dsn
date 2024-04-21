@@ -2,9 +2,34 @@ package dsn_test
 
 import (
 	"testing"
+	"unicode/utf8"
 
 	"github.com/sgaunet/dsn/v2/pkg/dsn"
 )
+
+func FuzzGetHost(f *testing.F) {
+	testcases := []string{"postgres://postgres:password@postgres-server:5432/postgres?sslmode=disable",
+		"postgres://postgres:password@host:5432/mydb?sslmode=disable",
+		"hostname",
+	}
+	for _, tc := range testcases {
+		f.Add(tc) // Use f.Add to provide a seed corpus
+	}
+	f.Fuzz(func(t *testing.T, orig string) {
+		d, err := dsn.New(orig)
+		if err != nil {
+			t.Skip()
+		}
+		host := d.GetHost()
+		scheme := d.GetScheme()
+		if !utf8.ValidString(host) {
+			t.Errorf("GetHost produced invalid UTF-8 string %q", host)
+		}
+		if !utf8.ValidString(scheme) {
+			t.Errorf("GetScheme produced invalid UTF-8 string %q", scheme)
+		}
+	})
+}
 
 func TestDSN_GetUser(t *testing.T) {
 	tests := []struct {

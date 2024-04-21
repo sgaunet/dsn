@@ -25,6 +25,12 @@ tasks:
       - go test -v -cover ./...
       - cd tests && venom run --stop-on-failure testsuite.yml  --output-dir="log"
 
+  fuzz:
+    desc: "Run fuzz tests"
+    dir: pkg/dsn
+    cmds:
+      - go test -v -fuzz ./...
+
   snapshot:
     desc: "Create a snapshot"
     cmds:
