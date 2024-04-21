@@ -27,7 +27,6 @@ tasks:
 
   fuzz:
     desc: "Run fuzz tests"
-    dir: pkg/dsn
     cmds:
       - go test -v -fuzz ./...
 
