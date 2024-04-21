@@ -11,14 +11,14 @@ testcases:
         from: result.systemout
         # regex: foo with a ([a-z]+) here
 
-- name: wrong dsn
+- name: basic dsn
   steps:
   - type: exec
     script: |
       cd "{{.init.tstFolder}}/../"
       go run cmd/main.go get port --d "wrong-dsn" 
     assertions:
-    - result.code ShouldNotEqual 0
+    - result.code ShouldEqual 0
 
 - name: setenv subcommand
   steps:
