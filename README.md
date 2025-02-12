@@ -27,8 +27,8 @@ host
 ## Option 2: With brew
 
 ```
-brew tap sgaunet/tools
-brew install dsn
+brew tap sgaunet/homebrew-tools
+brew install sgaunet/tools/dsn
 ```
 
 ## Option 3: Docker image
