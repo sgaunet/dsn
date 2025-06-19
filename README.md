@@ -38,7 +38,7 @@ brew install sgaunet/tools/dsn
 Possibility to copy the binary by using the docker image
 
 ```
-FROM sgaunet/dsn:latest as builder
+FROM ghcr.io/sgaunet/dsn:latest as builder
 
 FROM ....
 COPY --from builder /dsn /usr/bin/dsn
