@@ -30,7 +30,7 @@ type DSN struct {
 // New creates a new DSN from a string.
 // Format: <scheme>://<user>:<password>@<host>:<port>/<dbname>?<parameters>.
 //
-//nolint:cyclop,ireturn
+//nolint:cyclop
 func New(dsn string) (*DSN, error) {
 	// Reject paths that start with / and don't have a scheme or host part
 	if strings.HasPrefix(dsn, "/") && !strings.Contains(dsn, "://") {
@@ -232,7 +232,6 @@ func (d *DSN) StringRedacted() string {
 
 // SetParameter sets or updates a parameter in the DSN.
 //
-//nolint:ireturn
 func (d *DSN) SetParameter(key, value string) *DSN {
 	d.parameters[key] = value
 	return d
