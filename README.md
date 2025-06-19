@@ -2,6 +2,10 @@
 ![GitHub Downloads](https://img.shields.io/github/downloads/sgaunet/dsn/total)
 ![GitHub Release](https://img.shields.io/github/v/release/sgaunet/dsn)
 ![Test Coverage](https://raw.githubusercontent.com/wiki/sgaunet/dsn/coverage-badge.svg)
+[![Coverage](https://github.com/sgaunet/dsn/actions/workflows/coverage.yml/badge.svg)](https://github.com/sgaunet/dsn/actions/workflows/coverage.yml)
+[![Linter](https://github.com/sgaunet/dsn/actions/workflows/linter.yml/badge.svg)](https://github.com/sgaunet/dsn/actions/workflows/linter.yml)
+[![Build](https://github.com/sgaunet/dsn/actions/workflows/snapshot.yml/badge.svg)](https://github.com/sgaunet/dsn/actions/workflows/snapshot.yml)
+[![Release](https://github.com/sgaunet/dsn/actions/workflows/release.yml/badge.svg)](https://github.com/sgaunet/dsn/actions/workflows/release.yml)
 [![GoDoc](https://godoc.org/github.com/sgaunet/dsn/v3?status.svg)](https://godoc.org/github.com/sgaunet/dsn/v3)
 [![License](https://img.shields.io/github/license/sgaunet/dsn.svg)](LICENSE)
 
