@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sgaunet/dsn/v3"
+	"github.com/ghcr.io/sgaunet/dsn/v3"
 )
 
 func initDsnOrExit(dataSourceName string) dsn.DSN {

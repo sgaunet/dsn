@@ -1,10 +1,11 @@
 package dsn_test
 
 import (
+	"strings"
 	"testing"
 	"unicode/utf8"
 
-	"github.com/sgaunet/dsn/v3"
+	"github.com/ghcr.io/sgaunet/dsn/v3"
 )
 
 func FuzzGetHost(f *testing.F) {
@@ -492,7 +493,7 @@ func Test_dsntype_GetParameter(t *testing.T) {
 			}
 			if !tt.wantErr {
 				if got := d.GetParameter(tt.parameter); got != tt.want {
-					t.Errorf("DSN.GetHost() = %v, want %v", got, tt.want)
+					t.Errorf("DSN.GetParameter() = %v, want %v", got, tt.want)
 				}
 			}
 		})
@@ -575,12 +576,12 @@ func Test_dsntype_GetPassword(t *testing.T) {
 			want:      "",
 			wantErr:   false,
 		},
-		// {
-		// 	name:      "complex password",
-		// 	dsnToTest: "pg://user:%n,;/@host:5433",
-		// 	want:      "%¨n,;/",
-		// 	wantErr:   false,
-		// },
+		{
+			name:      "complex password",
+			dsnToTest: "pg://user:p%40ssw0rd!@host:5433",
+			want:      "p@ssw0rd!",
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -595,6 +596,159 @@ func Test_dsntype_GetPassword(t *testing.T) {
 			if !tt.wantErr {
 				if got := d.GetPassword(); got != tt.want {
 					t.Errorf("DSN.GetPassword() = %v, want %v", got, tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestGetParameters(t *testing.T) {
+	// Create a DSN with multiple parameters
+	dsnString := "postgres://user:password@host:5432/mydb?sslmode=disable&connect_timeout=10&search_path=public"
+	d, err := dsn.New(dsnString)
+	if err != nil {
+		t.Fatalf("Failed to create DSN: %v", err)
+	}
+
+	// Get the parameters map
+	params := d.GetParameters()
+
+	// Verify expected parameters exist with correct values
+	expected := map[string]string{
+		"sslmode":         "disable",
+		"connect_timeout": "10",
+		"search_path":     "public",
+	}
+
+	for k, v := range expected {
+		if params[k] != v {
+			t.Errorf("GetParameters()[%q] = %q, want %q", k, params[k], v)
+		}
+	}
+
+	// Verify map returned is a copy by modifying it
+	params["new_param"] = "test"
+
+	// Get parameters again and verify the original wasn't modified
+	newParams := d.GetParameters()
+	if _, exists := newParams["new_param"]; exists {
+		t.Error("GetParameters() should return a copy, not a reference to the internal map")
+	}
+}
+
+func TestSetParameter(t *testing.T) {
+	tests := []struct {
+		name       string
+		dsnToTest  string
+		paramKey   string
+		paramValue string
+		want       string
+		wantErr    bool
+	}{
+		{
+			name:       "add new parameter",
+			dsnToTest:  "postgres://host:5432/mydb",
+			paramKey:   "sslmode",
+			paramValue: "disable",
+			want:       "disable",
+			wantErr:    false,
+		},
+		{
+			name:       "update existing parameter",
+			dsnToTest:  "postgres://host:5432/mydb?sslmode=require",
+			paramKey:   "sslmode",
+			paramValue: "disable",
+			want:       "disable",
+			wantErr:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d, err := dsn.New(tt.dsnToTest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New(), wantErr %v, got %v", tt.wantErr, err)
+				return
+			}
+			if tt.wantErr && d != nil {
+				t.Errorf("expected d to be nil")
+			}
+			if !tt.wantErr {
+				// Set the parameter
+				d = d.SetParameter(tt.paramKey, tt.paramValue)
+
+				// Verify it was set correctly
+				if got := d.GetParameter(tt.paramKey); got != tt.want {
+					t.Errorf("After SetParameter, DSN.GetParameter(%q) = %v, want %v", tt.paramKey, got, tt.want)
+				}
+
+				// Check if parameters map contains expected value
+				params := d.GetParameters()
+				if params[tt.paramKey] != tt.want {
+					t.Errorf("Parameters map[%q] = %v, want %v", tt.paramKey, params[tt.paramKey], tt.want)
+				}
+			}
+		})
+	}
+}
+
+func TestStringRedacted(t *testing.T) {
+	tests := []struct {
+		name      string
+		dsnToTest string
+		want      string
+		wantErr   bool
+	}{
+		{
+			name:      "no password",
+			dsnToTest: "postgres://host:5432/mydb",
+			want:      "postgres://host:5432/mydb",
+			wantErr:   false,
+		},
+		{
+			name:      "with password",
+			dsnToTest: "postgres://user:password@host:5432/mydb?sslmode=disable",
+			want:      "postgres://user:****@host:5432/mydb?sslmode=disable",
+			wantErr:   false,
+		},
+		{
+			name:      "with complex password",
+			dsnToTest: "postgres://user-name:p@ssw0rd!@host-suffix.domain.com:5432/mydb-3?sslmode=require&connect_timeout=10s",
+			want:      "postgres://user-name:****@host-suffix.domain.com:5432/mydb-3?", // We'll check parameters separately
+			wantErr:   false,
+		},
+		{
+			name:      "with no scheme",
+			dsnToTest: "user:password@host",
+			want:      "user:****@host",
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d, err := dsn.New(tt.dsnToTest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New(), wantErr %v, got %v", tt.wantErr, err)
+				return
+			}
+			if tt.wantErr && d != nil {
+				t.Errorf("expected d to be nil")
+			}
+			if !tt.wantErr {
+				got := d.StringRedacted()
+				if tt.name == "with complex password" {
+					// For complex password case, check the base URL and parameters separately
+					if !strings.HasPrefix(got, tt.want) {
+						t.Errorf("DSN.StringRedacted() = %v, should start with %v", got, tt.want)
+					}
+					// Also check that both parameters exist
+					if !strings.Contains(got, "sslmode=require") {
+						t.Errorf("DSN.StringRedacted() missing parameter sslmode=require")
+					}
+					if !strings.Contains(got, "connect_timeout=10s") {
+						t.Errorf("DSN.StringRedacted() missing parameter connect_timeout=10s")
+					}
+				} else if got != tt.want {
+					t.Errorf("DSN.StringRedacted() = %v, want %v", got, tt.want)
 				}
 			}
 		})
