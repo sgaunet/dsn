@@ -9,8 +9,8 @@ tasks:
     cmds:
       - task -a
 
-  linters:
-    desc: "Run linters"
+  linter:
+    desc: "Run linter"
     cmds:
       - golangci-lint run # --fix
 
