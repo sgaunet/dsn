@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "dsn",
 	Short: "Tool to extract easily informations of a data source name",
@@ -16,6 +16,8 @@ var rootCmd = &cobra.Command{
 	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -32,13 +34,15 @@ func init() {
 	getCmd.AddCommand(getDBName)
 	getCmd.AddCommand(getHost)
 
-	getPort.PersistentFlags().StringVar(&defaultPort, "p", "", "default port to print in case of no port in data source name")
+	getPort.PersistentFlags().StringVar(&defaultPort, "p", "", 
+	"default port to print in case of no port in data source name")
 	getCmd.AddCommand(getPort)
 	getCmd.AddCommand(getUser)
 	getCmd.AddCommand(getPassword)
 
 	setEnvCmd.PersistentFlags().StringVar(&dataSourceName, "d", "", "data source name")
-	setEnvCmd.PersistentFlags().StringVar(&defaultPort, "p", "", "default port to print in case of no port in data source name")
+	setEnvCmd.PersistentFlags().StringVar(&defaultPort, "p", "", 
+	"default port to print in case of no port in data source name")
 	setEnvCmd.PersistentFlags().StringVar(&prefixVar, "pr", "", "prefix for environment variable")
 	rootCmd.AddCommand(setEnvCmd)
 }

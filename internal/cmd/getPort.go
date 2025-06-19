@@ -8,12 +8,12 @@ import (
 
 var defaultPort string
 
-// getCmd represents the get command
+// getCmd represents the get command.
 var getPort = &cobra.Command{
 	Use:   "port",
 	Short: "get port of data source name",
 	Long:  `get port of data source name`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		d := initDsnOrExit(dataSourceName)
 		fmt.Println(d.GetPort(defaultPort))
 	},

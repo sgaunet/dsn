@@ -1,3 +1,4 @@
+// Package cmd implements the command-line interface for the dsn tool.
 package cmd
 
 import (
@@ -8,12 +9,12 @@ import (
 
 var dataSourceName string
 
-// getCmd represents the get command
+// getCmd represents the get command.
 var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		fmt.Println("please select a subcommand")
 		_ = cmd.Help()
 	},

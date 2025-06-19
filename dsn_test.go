@@ -89,7 +89,7 @@ func TestDSN_GetUser(t *testing.T) {
 	}
 }
 
-func TestDSN_GetPostgresUri(t *testing.T) {
+func TestDSN_GetPostgresURI(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string
@@ -133,8 +133,8 @@ func TestDSN_GetPostgresUri(t *testing.T) {
 					t.Errorf("expected d to be nil")
 				}
 				if !tt.wantErr {
-					if got := d.GetPostgresUri(); got != tt.want {
-						t.Errorf("DSN.GetPostgresUri() = %v, want %v", got, tt.want)
+					if got := d.GetPostgresURI(); got != tt.want {
+						t.Errorf("DSN.GetPostgresURI() = %v, want %v", got, tt.want)
 					}
 				}
 			})
@@ -142,7 +142,7 @@ func TestDSN_GetPostgresUri(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetPortInt(t *testing.T) {
+func Test_DSN_GetPortInt(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string
@@ -193,7 +193,7 @@ func Test_dsntype_GetPortInt(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetPort(t *testing.T) {
+func Test_DSN_GetPort(t *testing.T) {
 	defaultPort := "5432"
 	tests := []struct {
 		name      string
@@ -284,7 +284,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetPath(t *testing.T) {
+func Test_DSN_GetPath(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string
@@ -329,7 +329,7 @@ func Test_dsntype_GetPath(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetScheme(t *testing.T) {
+func Test_DSN_GetScheme(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string
@@ -380,7 +380,7 @@ func Test_dsntype_GetScheme(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetHost(t *testing.T) {
+func Test_DSN_GetHost(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string
@@ -437,7 +437,7 @@ func Test_dsntype_GetHost(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetParameter(t *testing.T) {
+func Test_DSN_GetParameter(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string
@@ -551,7 +551,7 @@ func TestString(t *testing.T) {
 	}
 }
 
-func Test_dsntype_GetPassword(t *testing.T) {
+func Test_DSN_GetPassword(t *testing.T) {
 	tests := []struct {
 		name      string
 		dsnToTest string

@@ -7,7 +7,11 @@ import (
 	"github.com/ghcr.io/sgaunet/dsn/v3"
 )
 
-func initDsnOrExit(dataSourceName string) dsn.DSN {
+// initDsnOrExit creates a DSN object or exits with error code 1 if there's a problem.
+// Note: We must return the interface type here since the concrete implementation is unexported.
+//
+//nolint:ireturn
+func initDsnOrExit(dataSourceName string) *dsn.DSN {
 	if dataSourceName == "" {
 		fmt.Println("data source name is empty")
 		os.Exit(1)
