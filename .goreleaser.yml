@@ -36,7 +36,8 @@ changelog:
       - '^test:'
 
 brews:
-  - homepage: 'https://github.com/sgaunet/homebrew-tools'
+  - homepage: 'https://github.com/sgaunet/dsn'
+    description: 'dsn is a tiny library to handle data source name : scheme://user:password@host:port/dbname&sslmode=disable'
     directory: Formula
     commit_author:
       name: sgaunet
@@ -44,6 +45,13 @@ brews:
     repository:
       owner: sgaunet
       name: homebrew-tools
+      # Token with 'repo' scope is required for pushing to a different repository
+      token: '{{ .Env.HOMEBREW_TAP_TOKEN }}'
+    url_template: 'https://github.com/sgaunet/dsn/releases/download/{{ .Tag }}/{{ .ArtifactName }}'
+    install: |
+      bin.install "dsn"
+    test: |
+      system "#{bin}/dsn", "--help"
 
 dockers:
   # https://goreleaser.com/customization/docker/
