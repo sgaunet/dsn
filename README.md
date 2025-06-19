@@ -2,7 +2,7 @@
 ![GitHub Downloads](https://img.shields.io/github/downloads/sgaunet/dsn/total)
 ![GitHub Release](https://img.shields.io/github/v/release/sgaunet/dsn)
 ![Test Coverage](https://raw.githubusercontent.com/wiki/sgaunet/dsn/coverage-badge.svg)
-
+[![GoDoc](https://godoc.org/github.com/sgaunet/dsn/v3?status.svg)](https://godoc.org/github.com/sgaunet/dsn/v3)
 
 # dsn
 
