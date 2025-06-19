@@ -8,12 +8,12 @@ import (
 
 var prefixVar string
 
-// getCmd represents the get command
+// getCmd represents the get command.
 var setEnvCmd = &cobra.Command{
 	Use:   "setenv",
 	Short: "generate a bash script to set environment variables",
 	Long:  `generate a bash script to set environment variables`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		d := initDsnOrExit(dataSourceName)
 		PrintVar("SCHEME", d.GetScheme())
 		PrintVar("DBNAME", d.GetDBName())
@@ -24,6 +24,7 @@ var setEnvCmd = &cobra.Command{
 	},
 }
 
+// PrintVar prints an environment variable assignment to stdout with optional prefix.
 func PrintVar(name, value string) {
 	fmt.Printf("export %s%s=%s\n", prefixVar, name, value)
 }
