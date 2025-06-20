@@ -5,7 +5,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/ghcr.io/sgaunet/dsn/v3"
+	"github.com/sgaunet/dsn/v3"
 )
 
 func FuzzGetHost(f *testing.F) {
