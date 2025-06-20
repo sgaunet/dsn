@@ -1,4 +1,4 @@
-module github.com/ghcr.io/sgaunet/dsn/v3
+module github.com/sgaunet/dsn/v3
 
 go 1.22
 
