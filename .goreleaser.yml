@@ -49,7 +49,7 @@ brews:
       token: '{{ .Env.HOMEBREW_TAP_TOKEN }}'
     url_template: 'https://github.com/sgaunet/dsn/releases/download/{{ .Tag }}/{{ .ArtifactName }}'
     install: |
-      bin.install "dsn"
+      bin.install "{{ .ArtifactName }}" => "dsn"
     test: |
       system "#{bin}/dsn", "--help"
 
