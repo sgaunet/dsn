@@ -1,5 +1,4 @@
-.task
+/.task
 log
 /dsn
-dist
-/.devbox
+/dist
