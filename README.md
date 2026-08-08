@@ -1,4 +1,3 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/sgaunet/dsn)](https://goreportcard.com/report/github.com/sgaunet/dsn)
 ![GitHub Downloads](https://img.shields.io/github/downloads/sgaunet/dsn/total)
 ![GitHub Release](https://img.shields.io/github/v/release/sgaunet/dsn)
 ![Test Coverage](https://raw.githubusercontent.com/wiki/sgaunet/dsn/coverage-badge.svg)
