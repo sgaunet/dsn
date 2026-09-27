@@ -35,23 +35,41 @@ changelog:
       - '^docs:'
       - '^test:'
 
-brews:
-  - homepage: 'https://github.com/sgaunet/dsn'
-    description: 'dsn is a tiny library to handle data source name : scheme://user:password@host:port/dbname&sslmode=disable'
-    directory: Formula
+# Homebrew cask publishing (replaces the deprecated `brews:` block; casks are
+# what GoReleaser supports going forward)
+homebrew_casks:
+  - name: dsn
+    homepage: 'https://github.com/sgaunet/dsn'
+    description: 'Handle data source names like scheme://user:password@host:port/dbname'
+
+    # Tap repository directory (casks live in Casks/, not Formula/)
+    directory: Casks
+
+    # Command name users invoke, mapped from the artifact name.
+    binaries:
+      - dsn
+
+    # Download URL of the release artifact.
+    url:
+      template: 'https://github.com/sgaunet/dsn/releases/download/{{ .Tag }}/{{ .ArtifactName }}'
+
+    # Strip the Gatekeeper quarantine xattr so the installed binary can run.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}"]
+          end
+
     commit_author:
       name: sgaunet
       email: 1552102+sgaunet@users.noreply.github.com
+
     repository:
       owner: sgaunet
       name: homebrew-tools
       # Token with 'repo' scope is required for pushing to a different repository
       token: '{{ .Env.HOMEBREW_TAP_TOKEN }}'
-    url_template: 'https://github.com/sgaunet/dsn/releases/download/{{ .Tag }}/{{ .ArtifactName }}'
-    install: |
-      bin.install "{{ .ArtifactName }}" => "dsn"
-    test: |
-      system "#{bin}/dsn", "--help"
 
 dockers:
   # https://goreleaser.com/customization/docker/
